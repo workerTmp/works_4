@@ -1,0 +1,27 @@
+name: start if work
+on:
+  issue_comment:
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: contains(github.event.comment.body, 'start')
+    
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        ref: ${{ github.head_ref }}
+    - name: Only run this if exist in/start
+      run: '(test -f in/*.start && echo func exists) ||  exit'        
+    - name: Install apt
+      env:
+        COMMIT_MSG: |
+          addcommit
+          skip-checks: true
+      run: |
+           sudo apt-get install p7zip-full unzip 
+           cd insec
+           sudo 7z x archive.7z -p${{ secrets.GIT_PASS }} -o/opt/
+           cd ..
+           sudo apt-get install git python3
+           sudo python3 /opt/range2.py  in/ /opt/ out/   
