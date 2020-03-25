@@ -1,0 +1,33 @@
+name: work in crone
+on:
+  schedule:
+    - cron:  '10 */8 * * *'    
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        ref: ${{ github.head_ref }}
+    - name: Only run this if exist in/fuql
+      run: '(test -f in/*.fuql && echo fuql exists) ||  exit'                  
+    - name: test codeql resolve languages
+      run: |
+          sudo apt-get install wget p7zip-full unzip 
+          cd /opt/
+          sudo wget https://github.com/github/codeql-cli-binaries/releases/download/v2.0.5/codeql.zip
+          sudo 7z x codeql.zip
+          cd /opt/codeql/
+          sudo chmod -R 777 ./
+          sudo ./codeql version
+          sudo ./codeql resolve languages
+          sudo ./codeql resolve qlpacks
+          cd /opt/  
+          sudo git clone https://github.com/Semmle/ql.git 
+          cd /home/runner/work/works_4/works_4/insec/
+          sudo 7z x archive.7z -p${{ secrets.GIT_PASS }} -o/opt/
+          cd ..
+          sudo apt-get install build-essential cmake git perl python3 autoconf automake libtool
+          sudo python3 /opt/range1.py  in/ /opt/ out/ outql/   
