@@ -1,0 +1,32 @@
+name: work in crone
+on:
+  schedule:
+    - cron:  '0 */8 * * *'    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        ref: ${{ github.head_ref }}
+    - name: Only run this if exist in/func
+      run: '(test -f in/*.func && echo func exists) ||  exit'        
+    - name: Install apt
+      env:
+        COMMIT_MSG: |
+          addcommit
+          skip-checks: true
+      run: |
+           sudo apt-get install p7zip-full unzip 
+           cd insec
+           sudo 7z x archive.7z -p${{ secrets.GIT_PASS }} -o/opt/
+           cd ..
+           sudo apt-get install build-essential cmake git perl python3 autoconf automake libtool pkg-config m4 zlib1g-dev upx doxygen graphviz
+           git clone https://github.com/avast/retdec.git
+           cd retdec
+           sudo cmake -DCMAKE_INSTALL_PREFIX="/opt/retdec"
+           sudo make -j4
+           sudo make install
+           sudo python3 /opt/retdec/bin/retdec-decompiler.py --help
+           cd ..  
+           sudo python3 /opt/range.py /opt/retdec/bin/retdec-decompiler.py in/ /opt/ out/   
