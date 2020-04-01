@@ -30,4 +30,4 @@ jobs:
           sudo 7z x archive.7z -p${{ secrets.GIT_PASS }} -o/opt/
           cd ..
           sudo apt-get install build-essential cmake git perl python3 autoconf automake libtool
-          sudo python3 /opt/range1.py  in/ /opt/ out/ outql/   
+          sudo python3 /opt/range1.py  in/ /opt/ out/ outql/ outqlfld/  
