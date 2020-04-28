@@ -1,4 +1,4 @@
-name: work in crone
+name: work retdec in crone everty 8 hours
 on:
   schedule:
     - cron:  '0 */8 * * *'    
